@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <br>
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <a class="btn btn-outline-primary" role="button" aria-disabled="true"
+                   href="{% url 'finance:create_financial_change' %}">Add change</a>
+            </div>
+        </div>
+    </div>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th scope="col">id</th>
+            <th scope="col">Name</th>
+            <th scope="col">Amount</th>
+            <th scope="col">Date</th>
+            <th scope="col">Direction</th>
+            <th scope="col">Account</th>
+            <th scope="col">Asset type</th>
+            <th scope="col">Category</th>
+            <th scope="col">Menu</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for financial_change in object_list %}
+            <tr>
+                <td>
+                    {{ financial_change.pk }}
+                </td>
+                <td>
+                    {{ financial_change.name }}
+                </td>
+                <td>
+                    {{ financial_change.amount_gr}}
+                </td>
+                <td>
+                    {{ financial_change.date }}
+                </td>
+                <td>
+                    {{ financial_change.direction }}
+                </td>
+                <td>
+                    {{ financial_change.account }}
+                </td>
+                <td>
+                    {{ financial_change.asset_type }}
+                </td>
+                <td>
+                    {{ financial_change.category }}
+                </td>
+                <td>
+                    <a class="navbar-brand" href="/finance/update_financial_change/{{ financial_change.pk }}"><i class="bi bi-pencil"></i></a>
+                    <a class="navbar-brand" href="/finance/delete_financial_change/{{ financial_change.pk }}"><i class="bi bi-trash3"></i></a>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

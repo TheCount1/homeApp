@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+
+    <h1> New financial change from transfer</h1>
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <h2 style="color:{{ transfer.direction_colour }};">Przelew {{ transfer.direction }}</h2>
+            </div>
+            <div class="col">
+                <h2 style="color:{{ transfer.direction_colour }};">{{ transfer.transfer.amount_gr }} zł</h2>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <h3>od: {{ transfer.from_s }}</h3>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <h3>do: {{ transfer.to }}</h3>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <h3>tytuł: {{ transfer.transfer.title }}</h3>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                data przelewu: {{ transfer.transfer.operation_date }}
+            </div>
+            <div class="col">
+                data księgowania: {{ transfer.transfer.posting_date }}
+            </div>
+            <div class="col">
+                saldo: {{ transfer.transfer.balance }}
+            </div>
+            <div class="col">
+                opis: {{ transfer.transfer.description }}
+            </div>
+        </div>
+    </div>
+    <br>
+    <br>
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input type='hidden' name="transfer_pk" value="{{ transfer.transfer.pk }}" />
+        <input type="submit" value="Submit">
+    </form>
+
+{% endblock %}

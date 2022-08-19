@@ -1,0 +1,381 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <br>
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <a class="btn btn-outline-primary" role="button" aria-disabled="true"
+                   href="{% url 'finance:create_financial_change' %}">Add change</a>
+            </div>
+            <div class="col">
+                <a class="btn btn-outline-primary" role="button" aria-disabled="true"
+                   href="{% url 'finance:list_financial_change' %}">View list</a>
+            </div>
+            <div class="col">
+                <a class="btn btn-outline-primary" role="button" aria-disabled="true"
+                   href="{% url 'finance:import_transfer_file' %}">Import transfers</a>
+            </div>
+            <div class="col">
+                <a class="btn btn-outline-primary" role="button" aria-disabled="true"
+                   href="{% url 'finance:financial_change_from_transfer' %}">Obsłuż transfer</a>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <br>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <h2>Aktualna suma: {{ wealth_sum }}</h2>
+            </div>
+            <div class="col">
+                <h2>Gotówka: {{ cash_sum }}</h2>
+            </div>
+            <div class="col">
+                 <div id="container" style="width: 75%;">
+                    <canvas id="sum_by_asset_type" data-url="{% url 'finance:sum_by_asset_type' %}"></canvas>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <br>
+            </div>
+        </div>
+        <div class="row">
+                <div id="container" style="width: 75%;">
+                    <canvas id="summary_chart" data-url="{% url 'finance:summary_chart_data' %}"></canvas>
+                </div>
+        </div>
+        <div class="row">
+
+        </div>
+        <div class="row">
+                <div id="container" style="width: 75%;">
+                    <canvas id="income_by_category_chart" data-url="{% url 'finance:financial_change_monthly_sum_by_category' %}"></canvas>
+                </div>
+        </div>
+            <div class="row">
+                <div id="container" style="width: 75%;">
+                    <canvas id="income_by_asset_type_chart" data-url="{% url 'finance:financial_change_monthly_sum_by_asset_type' %}"></canvas>
+                </div>
+        </div>
+            <div class="row">
+                <div id="container" style="width: 75%;">
+                    <canvas id="income_expenses_chart" data-url="{% url 'finance:income_expenses_chart_data' %}"></canvas>
+                </div>
+        </div>
+    </div>
+
+ <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- Summary Chart function -->
+    <script>
+        $(function () {
+            var $summaryChartData = $("#summary_chart");
+            $.ajax({
+                url: $summaryChartData.data("url"),
+                success: function (data) {
+                    var ctx = $summaryChartData[0].getContext("2d");
+                    new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: data.time_labels,
+                            datasets: [{
+                                label: 'Sumaryczna wartość majątku',
+                                borderColor: 'blue',
+                                backgroundColor: 'transparent',
+                                data: data.sum_values
+                            },
+                                {
+                                label: 'Miesięczna zmiana majątku',
+                                borderColor: 'green',
+                                backgroundColor: 'transparent',
+                                data: data.monthly_change
+                            }
+                            ]
+                        },
+                        options: {
+                            scales: {
+                                y: {
+                                    suggestedMin: 0,
+                                    zeroLineWidth: 50
+                                }
+                            },
+                            responsive: true,
+                            legend: {
+                                position: 'top',
+                            },
+                            title: {
+                                display: true,
+                                text: 'Przychody i wydatki wg kategorii'
+                            },
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+  <!-- Total sum by Asset Type-->
+  <script>
+        $(function () {
+            var sumByAssetTypeData = $("#sum_by_asset_type");
+            $.ajax({
+                url: sumByAssetTypeData.data("url"),
+                success: function (data) {
+                    var ctx = sumByAssetTypeData[0].getContext("2d");
+                    ctx.canvas.width = 300;
+                    ctx.canvas.height = 300;
+                    new Chart(ctx, {
+                        type: 'pie',
+                        data: {
+                            labels: data.labels,
+                            datasets: [{
+                                data: data.data,
+                                backgroundColor: data.colours
+                            }
+                            ]
+                        },
+                        options: {
+
+                            responsive: false,
+                            legend: {
+                                position: 'top',
+                            },
+                            title: {
+                                display: true,
+                                text: 'Przychody i wydatki wg kategorii'
+                            },
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+
+    <!-- Income by Category-->
+  <script>
+        $(function () {
+            var $incomeByCategoryData = $("#income_by_category_chart");
+            $.ajax({
+                url: $incomeByCategoryData.data("url"),
+                success: function (data) {
+                    var ctx = $incomeByCategoryData[0].getContext("2d");
+                    new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: data.time_labels,
+                            datasets: [{
+                                label: 'Praca',
+                                borderColor: 'blue',
+                                backgroundColor: 'transparent',
+                                data: data.praca
+                            },
+                                {
+                                label: 'WAT',
+                                borderColor: 'green',
+                                backgroundColor: 'transparent',
+                                data: data.wat
+                            },
+                                {
+                                hidden: true,
+                                label: 'Pożyczki',
+                                borderColor: 'red',
+                                backgroundColor: 'transparent',
+                                data: data.pozyczki
+                            },
+                                {
+                                label: 'Nieruchomosci',
+                                borderColor: 'black',
+                                backgroundColor: 'transparent',
+                                data: data.nieruchomosci
+                            },
+                                {
+                                hidden: true,
+                                label: 'Przy Agorze 8',
+                                borderColor: 'red',
+                                backgroundColor: 'transparent',
+                                data: data.pa8
+                            },
+                                {
+                                hidden: true,
+                                label: 'Przy Agorze 7',
+                                borderColor: 'red',
+                                backgroundColor: 'transparent',
+                                data: data.pa7
+                            },
+                                {
+                                hidden: true,
+                                label: 'Dom',
+                                borderColor: 'red',
+                                backgroundColor: 'transparent',
+                                data: data.dom
+                            },
+                                {
+                                label: 'Podatki',
+                                borderColor: 'red',
+                                backgroundColor: 'transparent',
+                                data: data.podatki
+                            },
+                                {
+                                label: 'Firma',
+                                borderColor: 'red',
+                                backgroundColor: 'transparent',
+                                data: data.firma
+                            },
+                                {
+                                hidden: true,
+                                label: 'Akcje',
+                                borderColor: 'red',
+                                backgroundColor: 'transparent',
+                                data: data.akcje
+                            },
+                                {
+                                label: 'Życie',
+                                borderColor: 'red',
+                                backgroundColor: 'transparent',
+                                data: data.zycie
+                            }
+                            ]
+                        },
+                        options: {
+                            scales: {
+                                y: {
+                                    suggestedMin: 0,
+                                    zeroLineWidth: 50
+                                }
+                            },
+                            responsive: true,
+                            legend: {
+                                position: 'top',
+                            },
+                            title: {
+                                display: true,
+                                text: 'Przychody i wydatki wg kategorii'
+                            },
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+
+       <!-- Income by Asset Type-->
+  <script>
+        $(function () {
+            var $incomeByAssetTypeData = $("#income_by_asset_type_chart");
+            $.ajax({
+                url: $incomeByAssetTypeData.data("url"),
+                success: function (data) {
+                    var ctx = $incomeByAssetTypeData[0].getContext("2d");
+                    new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: data.time_labels,
+                            datasets: [{
+                                label: 'Pożyczka',
+                                borderColor: 'blue',
+                                backgroundColor: 'transparent',
+                                data: data.pozyczka
+                            },
+                                {
+                                label: 'Kredyt',
+                                borderColor: 'green',
+                                backgroundColor: 'transparent',
+                                data: data.kredyt
+                            },
+                                {
+                                hidden: true,
+                                label: 'Akcje',
+                                borderColor: 'red',
+                                backgroundColor: 'transparent',
+                                data: data.akcje
+                            },
+                                {
+                                label: 'Nieruchomosci',
+                                borderColor: 'black',
+                                backgroundColor: 'transparent',
+                                data: data.nieruchomosci
+                            },
+                                {
+                                hidden: true,
+                                label: 'Pieniądze',
+                                borderColor: 'red',
+                                backgroundColor: 'transparent',
+                                data: data.pieniadze
+                            }
+                            ]
+                        },
+                        options: {
+                            scales: {
+                                y: {
+                                    suggestedMin: 0,
+                                    zeroLineWidth: 50
+                                }
+                            },
+                            responsive: true,
+                            legend: {
+                                position: 'top',
+                            },
+                            title: {
+                                display: true,
+                                text: 'Przychody i wydatki wg kategorii'
+                            },
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+    <!-- Cash Income, Expenses -->
+<script>
+        $(function () {
+            var $incomeExpensesData = $("#income_expenses_chart");
+            $.ajax({
+                url: $incomeExpensesData.data("url"),
+                success: function (data) {
+                    var ctx = $incomeExpensesData[0].getContext("2d");
+                    new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: data.time_labels,
+                            datasets: [{
+                                label: 'Cash expenses',
+                                borderColor: 'red',
+                                backgroundColor: 'transparent',
+                                data: data.expenses_values
+                            },
+                            {
+                                label: 'Cash income',
+                                borderColor: 'green',
+                                backgroundColor: 'transparent',
+                                data: data.income_values
+                            }
+
+                            ]
+                        },
+                        options: {
+                            scales: {
+                                y: {
+                                    suggestedMin: 0,
+                                    zeroLineWidth: 50
+                                }
+                            },
+                            responsive: true,
+                            legend: {
+                                position: 'top',
+                            },
+                            title: {
+                                display: true,
+                                text: 'Przychody i wydatki w gotówce'
+                            },
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+
+{% endblock %}
