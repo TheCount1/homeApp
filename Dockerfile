@@ -1,7 +1,10 @@
 FROM python:3
 
-ENV DBuser = admin
-ENV DBpass = password
+ENV DBuser = admin \
+    DBpass = password \
+    DBname = name \
+    DBhost = host \
+    DBport = port
 
 WORKDIR /usr/src/homeApp
 

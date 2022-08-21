@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/4.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
-
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-%kl^kzs_g#3h%)yco6g=%i9+dy7y-4mxu^fhu%4=^0wxxu1cvy
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['192.168.0.111', '127.0.0.1']
 
 
 # Application definition
@@ -78,11 +78,11 @@ WSGI_APPLICATION = 'homeApp.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'finances_app',
-        'USER': 'finances_app',
-        'PASSWORD': 'aL9[zBE0*M',
-        'HOST': '192.168.0.111',
-        'PORT': '3306',
+        'NAME': os.environ.get('DBname'),
+        'USER': os.environ.get('DBname'),
+        'PASSWORD': os.environ.get('DBpass'),
+        'HOST': os.environ.get('DBhost'),
+        'PORT': os.environ.get('DBport'),
     }
 }
 
